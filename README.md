@@ -1,24 +1,22 @@
 This is a replacement for
-[Eric Fode's excellent `heroku-buildpack-rust`][fode], but with support for
-recent Rust nightly builds and [Cargo][cargo].  The intention is that this
-will involve into a production-quality, supported buildpack as Rust and
+[Eric Fode's excellent `heroku-buildpack-rust`][fode] based on
+[Eric Kidd's fork][emk], but with support for recent Rust nightly builds and
+[Cargo][cargo].  The intention is that this will involve into a production-quality, supported buildpack as Rust and
 Cargo mature.
 
 [fode]: https://github.com/ericfode/heroku-buildpack-rust
+[emk]: https://github.com/emk/heroku-buildpack-rust
 [cargo]: http://crates.io/
 
 ## Tracking dependencies with Cargo
 
 This is now the supported way of using this buildpack.  For instructions
-and example code, see
-[Deploying Rust applications to Heroku, with example code for Iron][instructions]
-and [heroku-rust-cargo-hello][].
+and example code, see [heroku-rust-cargo-hello][].
 
 The older support for `git submodule`-based projects is deprecated, and
 will be phased out at some point.
 
-[instructions]: http://www.randomhacks.net/2014/09/17/deploying-rust-heroku-iron/
-[heroku-rust-cargo-hello]: https://github.com/emk/heroku-rust-cargo-hello
+[heroku-rust-cargo-hello]: https://github.com/azolotko/heroku-rust-cargo-hello
 
 ## Development notes
 
@@ -42,16 +40,3 @@ ldd heroku-rust-cargo-hello/target/hello
 
 This gives you a system a lot like Heroku's Cedar stack, except that you
 can debug it locally.
-
-### Testing with Anvil
-
-You can also test this buildpack using [heroku-anvil][], which is _almost_
-the same as Heroku's regular build environment.
-
-``` sh
-heroku plugins:install https://github.com/ddollar/heroku-anvil
-cd heroku-rust-cargo-hello
-heroku build -b ../heroku-buildpack-rust
-```
-
-[heroku-anvil]: https://github.com/ddollar/heroku-anvil

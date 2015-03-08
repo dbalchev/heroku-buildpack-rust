@@ -1,28 +1,16 @@
 #!/bin/sh
 
 # Load our configuration variables.
-. "$1/RustConfig"
+. "$1/Rustfile"
 
 # Check our configuration options.
 if [ -z "$URL" ]; then
-  echo "failed: RustConfig must set URL to point to a Rust binary tarball."
+  echo "failed: Rustfile must set URL to point to a Rust binary tarball."
   exit 1
 fi
 if [ -z "$VERSION" ]; then
-  echo "failed: RustConfig must set VERSION to indicate the Rust version."
+  echo "failed: Rustfile must set VERSION to indicate the Rust version."
   exit 1
-fi
-
-# Check our Cargo configuration options if we have Cargo.toxml.
-if [ -f "$1/Cargo.toml" ]; then
-  if [ -z "$CARGO_URL" ]; then
-    echo "failed: RustConfig must set CARGO_URL to point to a Cargo binary tarball."
-    exit 1
-  fi
-  if [ -z "$CARGO_VERSION" ]; then
-    echo "failed: RustConfig must set CARGO_VERSION to indicate the Cargo version."
-    exit 1
-  fi
 fi
 
 # Switch to our cache directory.
@@ -62,36 +50,22 @@ else
   rm -r rust.tar.gz
 fi
 rust_path=`ls -1d "$2/rust-cache-$VERSION/"*"/"`
-if [ ! -x "$rust_path/bin/rustc" ]; then
-    echo "failed: Cannot find rust binaries at $rust_path/bin"
+rustc_path="$rust_path/rustc"
+if [ ! -x "$rustc_path/bin/rustc" ]; then
+    echo "failed: Cannot find rust binaries at $rustc_path/bin"
     exit 1
 fi
-PATH="$rust_path/bin:$PATH"
-LD_LIBRARY_PATH="$rust_path/lib:$LD_LIBRARY_PATH"
+PATH="$rustc_path/bin:$PATH"
+LD_LIBRARY_PATH="$rustc_path/lib:$LD_LIBRARY_PATH"
 echo $LD_LIBRARY_PATH
 
 if [ -f "$1/Cargo.toml" ]; then
-  if [ -d cargo-cache-$CARGO_VERSION ]; then
-    echo "-----> Using Cargo version $CARGO_VERSION"
-  else
-    echo "-----> Downloading Cargo version $CARGO_VERSION binaries from $CARGO_URL"
-
-    rm -f cargo.tar.gz
-    rm -rf cargo-cache-*
-    curl -o cargo.tar.gz "$CARGO_URL"
-
-    echo "-----> Extracting Cargo binaries"
-
-    mkdir cargo-cache-$CARGO_VERSION
-    tar xzf cargo.tar.gz -C cargo-cache-$CARGO_VERSION
-    rm -r cargo.tar.gz
-  fi
-  cargo_path=`ls -1d "$2/cargo-cache-$CARGO_VERSION/"*"/bin"`
-  if [ ! -x "$cargo_path/cargo" ]; then
-      echo "failed: Cannot find cargo binaries at $cargo_path"
+  cargo_path="$rust_path/cargo"
+  if [ ! -x "$cargo_path/bin/cargo" ]; then
+      echo "failed: Cannot find cargo binaries at $cargo_path/bin"
       exit 1
   fi
-  PATH="$cargo_path:$PATH"
+  PATH="$cargo_path/bin:$PATH"
 
   # Make sure we have a fake home directory for the Cargo cache.  Ideally
   # we would keep these in our cache, but our ".git" directories don't
